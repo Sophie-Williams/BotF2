@@ -127,7 +127,7 @@ namespace Supremacy.Combat
             FriendlyCombatShips = new List<Tuple<CombatUnit, CombatWeapon[]>>();
             FriendlyCombatShips.Clear();
 
-            var firstFriendlyUnit = _combatShips.FirstOrDefault();
+            var firstAsset = _combatShips.FirstOrDefault();
 
             //for (int i = 0; i < _combatShips.Count; i++)
             //{
@@ -135,32 +135,76 @@ namespace Supremacy.Combat
             //        //_combatShips[i].Item1.Source.ObjectID, _combatShips[i].Item1.Source.Name, _combatShips[i].Item1.Source.Design, i);
             //}
             
-            foreach (var combatent in _combatShips)
+            foreach (var currentAsset in _combatShips)
             {
-                if (GetTargetOne(combatent.Item1.Owner) == firstFriendlyUnit.Item1.Owner || GetTargetTwo(combatent.Item1.Owner).ToString() == firstFriendlyUnit.Item1.Owner.Key)
-                    //  if (CombatHelper.WillEngage(combatent.Item1.Owner, firstFriendlyUnit.Item1.Owner))
+
+                    //GameLog.Core.Test.DebugFormat("if {0} == {1}  ",
+                    //    //"* or * {2} != {3}",
+                    //    currentAsset.Item1.Owner.ToString()
+                    //    //GetTargetOne(currentAsset.Item1.Owner).ToString()
+                    //    , firstAsset.Item1.Owner.ToString()
+                    //    , GetTargetTwo(currentAsset.Item1.Owner).ToString()
+                    //    , firstAsset.Item1.Owner.Key
+                    //    );
+
+
+                if (currentAsset.Item1.Owner == firstAsset.Item1.Owner )
+                    //|| GetTargetTwo(currentAsset.Item1.Owner).ToString() != firstAsset.Item1.Owner.Key)
+                    //  if (CombatHelper.WillEngage(currentAsset.Item1.Owner, firstAsset.Item1.Owner))
                 {
-                    OppositionCombatShips.Add(combatent);
-                    OppositionCombatShips.Randomize();
+                    FriendlyCombatShips.Add(currentAsset);
+
+                    GameLog.Core.Test.DebugFormat("first= {0}, current= {1}: adding to FRIENDLY_CombatShips: {2} {3} D={4}={5}",
+                        firstAsset.Item1.Owner.Key
+                        , currentAsset.Item1.Owner.Key
+                        , currentAsset.Item1.Source.ObjectID
+                        , currentAsset.Item1.Source.Name
+                        , currentAsset.Item1.Source.Design.DesignID
+                        , currentAsset.Item1.Source.Design
+                        );
                 }
                 else
-                //if (CombatHelper.WillFightAlongside(combatent.Item1.Owner, firstFriendlyUnit.Item1.Owner)) ??? conflict with target choices by friendly civ?
+                //if (CombatHelper.WillFightAlongside(currentAsset.Item1.Owner, firstAsset.Item1.Owner)) ??? conflict with target choices by friendly civ?
                 {
-                    FriendlyCombatShips.Add(combatent);
-                    FriendlyCombatShips.Randomize();
+
+                    OppositionCombatShips.Add(currentAsset);
+
+                    GameLog.Core.Test.DebugFormat("first= {0}, current= {1}: adding to OppositionCombatShips: {2} {3} D={4}={5}",
+                        firstAsset.Item1.Owner.Key
+                        , currentAsset.Item1.Owner.Key
+                        , currentAsset.Item1.Source.ObjectID
+                        , currentAsset.Item1.Source.Name
+                        , currentAsset.Item1.Source.Design.DesignID
+                        , currentAsset.Item1.Source.Design
+                        );
+
+
                 }
                 //GameLog.Core.Test.DebugFormat("Combatent = {0}, Combatent Owner = {1}, ship to evaluation Owner ={2} and Key ={3} vs GetTargetOne civ = {4}",
-                //combatent, combatent.Item1.Owner, firstFriendlyUnit.Item1.Owner, GetTargetOne(combatent.Item1.Owner), firstFriendlyUnit.Item1.Owner);
-                GameLog.Core.Test.DebugFormat("Combatent = {0} O= {1} {2}, ... friendlyUnit: {3} {4} O= {5} Key = {6}, ... GetTargetOne = {7}",
-                                        combatent.Item1.Source.ObjectID,
-                                        combatent.Item1.Source.Design,
-                                        combatent.Item1.Owner,
-                                        firstFriendlyUnit.Item1.Source.ObjectID,
-                                        firstFriendlyUnit.Item1.Source.Design,
-                                        firstFriendlyUnit.Item1.Owner,
-                                        firstFriendlyUnit.Item1.Owner.Key,
-                                        GetTargetOne(combatent.Item1.Owner).ToString());
+                //currentAsset, currentAsset.Item1.Owner, firstAsset.Item1.Owner, GetTargetOne(currentAsset.Item1.Owner), firstAsset.Item1.Owner);
+
+                if (currentAsset.Item1.Owner != firstAsset.Item1.Owner)
+                {
+                    GameLog.Core.Test.DebugFormat("-------------------------------------------------------------------");
+                    //, ... GetTargetOne = {7}
+                    GameLog.Core.Test.DebugFormat("currentAsset = {0} D={1} O={2}  *vs*  friendlyUnit: {3} D={4} O= {5} (Key = {6})",
+                                            currentAsset.Item1.Source.ObjectID,
+                                            //currentAsset.Item1.Source.Design,  // just DesignID  makes lines shorter
+                                            currentAsset.Item1.Source.Design.DesignID,   // just DesignID  makes lines shorter
+                                            currentAsset.Item1.Owner,
+                                            firstAsset.Item1.Source.ObjectID,
+                                            //firstAsset.Item1.Source.Design,  // just DesignID  makes lines shorter
+                                            firstAsset.Item1.Source.Design.DesignID,   // just DesignID  makes lines shorter
+                                            firstAsset.Item1.Owner,
+                                            firstAsset.Item1.Owner.Key
+                                            //, GetTargetOne(currentAsset.Item1.Owner).ToString()
+                                            );
+                }
             }
+
+            FriendlyCombatShips.Randomize();
+            OppositionCombatShips.Randomize();
+
             double ratioATemp = 0.00; // used to transform ship.Count to double decimals
             double ratioBTemp = 0.00; // used to transform ship.Count to double decimals
 
@@ -368,6 +412,9 @@ namespace Supremacy.Combat
                     case CombatOrder.Formation:
 
                         var attackingShip = _combatShips[i].Item1;
+
+                        GameLog.Core.Test.DebugFormat("----------------------------------");
+                        GameLog.Core.Test.DebugFormat("Next: ChooseTarget for {0} {1} ({2})", attackingShip.Source.ObjectID, attackingShip.Name, attackingShip.Source.Design);
                         var target = ChooseTarget(attackingShip);
                         if (order != CombatOrder.Formation && order != CombatOrder.Engage)
                         {
@@ -666,7 +713,11 @@ namespace Supremacy.Combat
             }
 
             // needs to add, not retreated.
-            List<Tuple<CombatUnit, CombatWeapon[]>> oppositionShips = _combatShips.Where(cs => CombatHelper.WillEngage(attacker.Owner, cs.Item1.Owner) && !cs.Item1.IsCloaked && !cs.Item1.IsDestroyed && attackerShipOwner != cs.Item1.Owner).ToList();
+
+            GameLog.Core.Test.DebugFormat("returning targets (yet without using TargetOne etc.)");
+            var TargetCivOne = _roundNumber;
+
+            List <Tuple<CombatUnit, CombatWeapon[]>> oppositionShips = _combatShips.Where(cs => CombatHelper.WillEngage(attacker.Owner, cs.Item1.Owner) && !cs.Item1.IsCloaked && !cs.Item1.IsDestroyed && attackerShipOwner != cs.Item1.Owner).ToList();
             bool hasOppositionStation = (_combatStation != null) && !_combatStation.Item1.IsDestroyed && (_combatStation.Item1.Owner != attacker.Owner);
             while (true)
             {
@@ -674,18 +725,26 @@ namespace Supremacy.Combat
                 {
                     case CombatOrder.Engage:
                     case CombatOrder.Formation:
+
                         //Only ships to target                     
                         if (!hasOppositionStation && (oppositionShips.Count() > 0))
                         {
+                            GameLog.Core.Test.DebugFormat("returning as target ( No station ): {0} {1} D={2} (first of opposition ships)",
+                                  oppositionShips.FirstOrDefault().Item1.Source.ObjectID,
+                                  oppositionShips.FirstOrDefault().Item1.Source.Name,
+                                  oppositionShips.FirstOrDefault().Item1.Source.Design
+                                  );
+
                             return oppositionShips.FirstOrDefault().Item1;
                         }
-                        //Has both ships and station to target
+
+                        //Has both:  ships and station to target
                         if (hasOppositionStation && (oppositionShips.Count() > 0))
                         {
                             var oppOrder = GetOrder(oppositionShips.FirstOrDefault().Item1.Source);
                             if (oppOrder == CombatOrder.Formation) //(RandomHelper.Random(5) == 0)
                             {
-                                GameLog.Core.Combat.DebugFormat("",
+                                GameLog.Core.Test.DebugFormat("returning as target (order is FORMATION): {0} {1} D={2}, order = {3}",
                                  oppositionShips.FirstOrDefault().Item1.Source.ObjectID,
                                   oppositionShips.FirstOrDefault().Item1.Source.Name,
                                   oppositionShips.FirstOrDefault().Item1.Source.Design,
@@ -694,15 +753,23 @@ namespace Supremacy.Combat
                             }
                             else
                             {
+                                GameLog.Core.Test.DebugFormat("returning as target against Station: {0} {1} D={2}, order = {3}",
+                                  _combatStation.Item1.Source.ObjectID,
+                                  _combatStation.Item1.Source.Name,
+                                  _combatStation.Item1.Source.Design,
+                                  oppOrder);
+
                                 return _combatStation.Item1;
                             }
                             // ´MAYBE needs change that target cannot be retreated ships...
                         }
+
                         //Only has a station to target
                         if (hasOppositionStation)
                         {
                             return _combatStation.Item1;
                         }
+
                         //Nothing to target
                         return null;
 

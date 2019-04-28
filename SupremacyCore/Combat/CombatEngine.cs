@@ -45,6 +45,9 @@ namespace Supremacy.Combat
         protected Tuple<CombatUnit, CombatWeapon[]> _combatStation;
         private readonly int _combatId;
         protected int _roundNumber;
+        private Civilization _targetCivOne;
+        public Civilization TargetedCiv1;
+        private Civilization _targetCivTwo;
         private bool _runningOrders;
         private bool _runningTargetOne;
         private bool _runningTargetTwo;
@@ -228,6 +231,8 @@ namespace Supremacy.Combat
             _allSidesStandDown = false;
             _combatId = GameContext.Current.GenerateID();
             _roundNumber = 1;
+            _targetCivOne = TargetedCiv1;
+            _targetCivTwo = assets.FirstOrDefault().Owner;
             _assets = assets;
             _updateCallback = updateCallback;
             _combatEndedCallback = combatEndedCallback;
@@ -450,9 +455,21 @@ namespace Supremacy.Combat
             foreach (var playerAsset in _assets)
             {
                 var owner = playerAsset.Owner;
+                var _targetCivOne = playerAsset.Owner;
+                var _targetCivTwo = playerAsset.Owner;
                 var friendlyAssets = new List<CombatAssets>();
                 var hostileAssets = new List<CombatAssets>();
                 var empireStrengths = new Dictionary<Civilization, int>();
+
+                try
+                {
+                    GameLog.Core.Test.DebugFormat("TargetedCiv1 = {0}", TargetedCiv1.Key);
+                    _targetCivOne =TargetedCiv1;
+                }
+                catch
+                {
+
+                }
 
                 friendlyAssets.Add(playerAsset);
 
@@ -515,6 +532,16 @@ namespace Supremacy.Combat
                     break;
                 }
 
+                if (TargetedCiv1 != null)
+                {
+                    _targetCivOne = TargetedCiv1;
+                    GameLog.Core.Test.DebugFormat("_targetCivOne = {0}", _targetCivOne.Key);
+                }
+                else
+                {
+                    GameLog.Core.Test.DebugFormat("##################################### TargetedCiv1 == null, target is re-directed to itself");
+                }
+
 
                 var update = new CombatUpdate(
                     _combatId,
@@ -523,7 +550,9 @@ namespace Supremacy.Combat
                     owner,
                     playerAsset.Location,
                     friendlyAssets,
-                    hostileAssets
+                    hostileAssets,
+                    _targetCivOne,
+                    _targetCivTwo
                     );
 
                 AsyncHelper.Invoke(_updateCallback, this, update);
@@ -764,22 +793,26 @@ namespace Supremacy.Combat
             return CombatOrder.Retreat;
         }
 
-        protected Civilization GetTargetOne(Civilization source)
+        protected Civilization GetTargetOne()
         {
-            try
-            {
-                GameLog.Core.Test.DebugFormat("Try Setting target one for CivID = {0}, Name {1}, {2} and return = {3}",
-                    source.CivID, source.Name, source.ShortName, _targetOneByCiv[source.CivID].Owner);
-                return _targetOneByCiv[source.CivID].Owner;//.GetTargetOne(source);
-            }
-            catch (Exception e)
-            {
-                GameLog.Core.Test.ErrorFormat("Unable to get target one for {0} ({1}, exception = {2})", source.ShortName, source.Name, e);
-                //GameLog.LogException(e);
-            }
+
             Civilization borg = new Civilization();
             borg.CivID = 6;
             borg.Key = "BORG";
+            try
+            {
+                return _targetCivOne;
+                //GameLog.Core.Test.DebugFormat("Try Setting target one for CivID = {0}, Name {1}, {2} and return = {3}",
+                //    source.CivID, source.Name, source.ShortName, _targetOneByCiv[source.CivID].Owner);
+                //return _targetOneByCiv[source.CivID].Owner;//.GetTargetOne(source);
+                //return borg;//.GetTargetOne(source);
+            }
+            catch (Exception e)
+            {
+                GameLog.Core.Test.ErrorFormat("Unable to get target one for .., exception = {0})", e);
+                //GameLog.LogException(e);source.ShortName, source.Name
+            }
+
            
             //GameLog.Core.Combat.DebugFormat("Setting Borg as fallback target one for {0} {1} ({2}) Owner: {3}", source.ObjectID, source.Name, source.Design.Name, source.Owner.Name);
             //return _targetOneByCiv[source.CivID].GetTargetOne(source);
@@ -791,7 +824,8 @@ namespace Supremacy.Combat
             try
             {
                 GameLog.Core.Combat.DebugFormat("Setting Borg as target two for CivID = {0}, Name {1}, {2}", source.CivID, source.Name, source.ShortName);
-                return _targetTwoByCiv[source.CivID].GetTargetTwo(source);
+                return CombatTargetTwo.BORG;
+                //return _targetTwoByCiv[source.CivID].GetTargetTwo(source);
                 
             }
             catch //(Exception e)

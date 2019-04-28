@@ -62,7 +62,7 @@ namespace Supremacy.Combat
             _targetPrimaries = new Dictionary<int, Civilization>();
             _combatId = combatId;
 
-            GameLog.Core.Combat.DebugFormat("CombatTargetPrimaries owner = {0}, _combatID = {1}", owner, _combatId);
+            //GameLog.Core.Test.DebugFormat("CombatTargetPrimaries owner = {0}, _combatID = {1}", owner, _combatId);
 
         }
         public void SetTargetOne(Civilization source, Civilization targetOne)
@@ -74,7 +74,7 @@ namespace Supremacy.Combat
             }
             _targetPrimaries[source.CivID] = targetOne;
 
-            GameLog.Core.Test.DebugFormat("source short name ={0}, source ={1} CombatTargetOne = {2}", source.ShortName, source, targetOne);
+            //GameLog.Core.Test.DebugFormat("source short name ={0}, source ={1} CombatTargetOne = {2}", source.ShortName, source, targetOne);
         }
 
         public void ClearTargetOne(Civilization source)
@@ -105,8 +105,8 @@ namespace Supremacy.Combat
             }
             if (!_targetPrimaries.ContainsKey(source.CivID))
             {
-                GameLog.Core.Test.DebugFormat("No target One in _targetPrimaries. source short name ={0}, source ={1} CombatTargetOne = {2}",
-                    source.ShortName, source);
+                //GameLog.Core.Test.DebugFormat("No target One in _targetPrimaries. source short name ={0}, source ={1} CombatTargetOne = {2}",
+                    //source.ShortName, source);
                 throw new ArgumentException("No target one has been set for the specified source");
             }
              return _targetPrimaries[source.CivID];

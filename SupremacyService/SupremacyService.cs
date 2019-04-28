@@ -1542,8 +1542,8 @@ namespace Supremacy.WCF
                    ownerAssets.Owner, enemyAssets.CombatShips.Count + countStation, ownerAssets.CombatShips.Count + 1, blanketOrder);
 
                 SendCombatOrders(CombatHelper.GenerateBlanketOrders(ownerAssets, blanketOrder)); // Sending of the order
-                SendCombatTargetOnes(CombatHelper.GenerateTargetPrimary(ownerAssets, blanketTargetOne));
-                SendCombatTargetTwos(CombatHelper.GenerateTargetSecondary(ownerAssets, blanketTargetTwo));
+                //SendCombatTargetOnes(CombatHelper.GenerateTargetPrimary(ownerAssets, blanketTargetOne));
+                //SendCombatTargetTwos(CombatHelper.GenerateTargetSecondary(ownerAssets, blanketTargetTwo));
             }
 
 

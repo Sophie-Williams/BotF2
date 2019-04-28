@@ -261,33 +261,35 @@ namespace Supremacy.Combat
             return orders;
         }
 
-        public static CombatTargetPrimaries GenerateTargetPrimary(CombatAssets assets, Civilization target)
-        {
-            //bool _generateTargetPrimariesTracing = true; 
+        //public static CombatTargetPrimaries GenerateTargetPrimary(CombatAssets assets, Civilization target)
+        //public static CombatTargetPrimaries GenerateTargetPrimary()
+        //{
+        //    //bool _generateTargetPrimariesTracing = true;
 
-            var owner = assets.Owner;
-            var targetOne = new CombatTargetPrimaries(owner, assets.CombatID);
+        //    var owner = assets.Owner;
+        //    var targetOne = new CombatTargetPrimaries(owner, assets.CombatID);
 
-            foreach (var ship in assets.CombatShips)  // CombatShips
-            {
-                targetOne.SetTargetOne(ship.Source.Owner, target);
-                targetOne.Distinct().ToList();
-            }
-            foreach (var ship in assets.NonCombatShips) // NonCombatShips (decided by carrying weapons)
-            {
-                targetOne.SetTargetOne(ship.Source.Owner, target);
-                targetOne.Distinct().ToList();
-            }
-            if (assets.Station != null && assets.Station.Owner == owner)  // Station (only one per Sector possible)
-            {
-                targetOne.SetTargetOne(assets.Station.Source.Owner, target);
-                targetOne.Distinct().ToList();
-            }
 
-            GameLog.Client.Combat.DebugFormat("GenerateTargetPrimary targets Onwer = {0}, (shooting)Assets.Owner ={1}, target enum = {2}",
-                targetOne.Owner, owner, target.ToString());
-            return targetOne;
-        }
+        //    //foreach (var ship in assets.CombatShips)  // CombatShips
+        //    //{
+        //    //    targetOne.SetTargetOne(ship.Source.Owner, target);
+        //    //    targetOne.Distinct().ToList();
+        //    //}
+        //    //foreach (var ship in assets.NonCombatShips) // NonCombatShips (decided by carrying weapons)
+        //    //{
+        //    //    targetOne.SetTargetOne(ship.Source.Owner, target);
+        //    //    targetOne.Distinct().ToList();
+        //    //}
+        //    //if (assets.Station != null && assets.Station.Owner == owner)  // Station (only one per Sector possible)
+        //    //{
+        //    //    targetOne.SetTargetOne(assets.Station.Source.Owner, target);
+        //    //    targetOne.Distinct().ToList();
+        //    //}
+
+        //    //GameLog.Client.Combat.DebugFormat("GenerateTargetPrimary targets Onwer = {0}, (shooting)Assets.Owner ={1}, target enum = {2}",
+        //    //    targetOne.Owner, owner, target.ToString());
+        //    return targetOne;
+        //}
 
         public static CombatTargetSecondaries GenerateTargetSecondary(CombatAssets assets, CombatTargetTwo target)
         {

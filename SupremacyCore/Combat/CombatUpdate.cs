@@ -24,6 +24,8 @@ namespace Supremacy.Combat
     {
         private int _combatId;
         private int _roundNumber;
+        private int _targetCivOneId;
+        private int _targetCivTwoId;
         private int _ownerId;
 
         private bool _standoff;
@@ -38,7 +40,8 @@ namespace Supremacy.Combat
         private int _friendlyEmpireStrength;
         private int _allHostileEmpireStrength;
 
-        public CombatUpdate(int combatId, int roundNumber, bool standoff, Civilization owner, MapLocation location, IList<CombatAssets> friendlyAssets, IList<CombatAssets> hostileAssets)
+        public CombatUpdate(int combatId, int roundNumber, bool standoff, Civilization owner, MapLocation location, 
+            IList<CombatAssets> friendlyAssets, IList<CombatAssets> hostileAssets, Civilization targetCivOne, Civilization targetCivTwo)
         {
             if (owner == null)
                 throw new ArgumentNullException("owner");
@@ -49,11 +52,25 @@ namespace Supremacy.Combat
 
             _combatId = combatId;
             _roundNumber = roundNumber;
+
             _standoff = standoff;
             _ownerId = owner.CivID;
             _location = location;
             _friendlyAssets = friendlyAssets;
             _hostileAssets = hostileAssets;
+            _targetCivOneId = targetCivOne.CivID;
+            _targetCivTwoId = targetCivTwo.CivID;
+
+            GameLog.Core.Test.DebugFormat("combatId = {0}, _roundNumber= {1}, owner.Key= {2}, location= {3}, friendlyCivs.Count= {4}, hostileCivs.Count= {5}, targetCivOne= {6}, targetCivTwo= {7}"
+                , combatId
+                , roundNumber
+                , owner.Key
+                , location
+                , hostileAssets.Count()
+                , friendlyAssets.Count()
+                , targetCivOne
+                , targetCivTwo
+                );
 
         }
         #region Properties for total fire power of the friends and Others (hostiles)
@@ -517,6 +534,20 @@ namespace Supremacy.Combat
         }
 
         public Civilization Owner
+        {
+            get { return GameContext.Current.Civilizations[_ownerId]; }
+        }
+
+        public Civilization TargetCivOne
+        {
+            get
+            {
+                GameLog.Core.Test.DebugFormat("TargetCivOne returning");
+                return GameContext.Current.Civilizations[_ownerId];
+            }
+        }
+
+        public Civilization TargetCivTwo
         {
             get { return GameContext.Current.Civilizations[_ownerId]; }
         }

@@ -22,10 +22,10 @@ namespace Supremacy.Combat
 
     public abstract class CombatEngine
     {
-       
+
         private bool _battleInOwnTerritory;
         private int _totalFirepower; // looks like _empireStrenths dictionary below
-        private double _favorTheBoldMalus; 
+        private double _favorTheBoldMalus;
         private int _fleetAsCommandshipBonus;
         private bool _has20PlusPercentFastAttack;
 
@@ -198,7 +198,7 @@ namespace Supremacy.Combat
             }
         }
 
- 
+
         protected CombatEngine(
             List<CombatAssets> assets,
             SendCombatUpdateCallback updateCallback,
@@ -242,24 +242,24 @@ namespace Supremacy.Combat
                     _combatStation = new Tuple<CombatUnit, CombatWeapon[]>(
                         civAssets.Station,
                         CombatWeapon.CreateWeapons(civAssets.Station.Source));
-                                   
+
                 }
                 foreach (CombatUnit shipStats in civAssets.CombatShips)
                 {
                     _combatShips.Add(new Tuple<CombatUnit, CombatWeapon[]>(
                         shipStats,
                         CombatWeapon.CreateWeapons(shipStats.Source)));
-                  
+
                 }
                 foreach (CombatUnit shipStats in civAssets.NonCombatShips)
                 {
                     _combatShips.Add(new Tuple<CombatUnit, CombatWeapon[]>(
                         shipStats,
                         CombatWeapon.CreateWeapons(shipStats.Source)));
-                  
-                    
+
+
                 }
-               
+
             }
         }
 
@@ -346,13 +346,13 @@ namespace Supremacy.Combat
         {
             lock (_orders)
             {
-                RunningOrders = true;
-                lock (_targetOneByCiv)
-                {
-                    RunningTargetOne = true;
-                    lock (_targetTwoByCiv)
-                    {
-                        GameLog.Core.CombatDetails.DebugFormat("ResolveCombatRound");
+                //RunningOrders = true;
+                //lock (_targetOneByCiv)
+                //{
+                //    RunningTargetOne = true;
+                //    lock (_targetTwoByCiv)
+                //    {
+                        GameLog.Core.Test.DebugFormat("ResolveCombatRound");
 
                         RunningTargetTwo = true;
 
@@ -375,28 +375,34 @@ namespace Supremacy.Combat
                         GameLog.Core.CombatDetails.DebugFormat("ResolveCombatRound - before UpdateOrbitals");
                         UpdateOrbitals();
 
-                        if (!IsCombatOver)
-                        {
-                            _roundNumber++;
-                        }
-                        _targetTwoByCiv.Clear();
-                    }
-                    _targetOneByCiv.Clear();
-                }
+                        //if (!IsCombatOver)
+                        //{
+                        //    _roundNumber++;
+                        //}
+                //        _targetTwoByCiv.Clear();
+                //    }
+                //    _targetOneByCiv.Clear();
+                //}
+
                 _orders.Clear();
+                if (!IsCombatOver)
+                {
+                    _roundNumber++;
+                }
             }
+
             SendUpdates();
 
             GameLog.Core.CombatDetails.DebugFormat("ResolveCombatRound - before RemoveDefeatedPlayers");
             RemoveDefeatedPlayers();
 
             RunningOrders = false;
-            RunningTargetOne = false;
-            RunningTargetTwo = false;
+            //RunningTargetOne = false;
+            //RunningTargetTwo = false;
 
             if (IsCombatOver)
             {
-                GameLog.Core.CombatDetails.DebugFormat("ResolveCombatRound - IsCombatOver = TRUE");
+                GameLog.Core.Test.DebugFormat("ResolveCombatRound - IsCombatOver = TRUE");
                 AsyncHelper.Invoke(_combatEndedCallback, this);
             }
         }
@@ -606,7 +612,7 @@ namespace Supremacy.Combat
 
             GameLog.Core.Combat.DebugFormat("Calculating retreat for {0} {1}", unit.Source.ObjectID, unit.Source.Name);
 
-            if (oppositionIsInFormation ||oppositonIsHailing || oppsoitionIsRetreating) // If you go into formation or hailing or Retreating you are not in position to stop the opposition from retreating                   
+            if (oppositionIsInFormation || oppositonIsHailing || oppsoitionIsRetreating) // If you go into formation or hailing or Retreating you are not in position to stop the opposition from retreating                   
             {
                 GameLog.Core.Combat.DebugFormat("{0} {1} successfully retreated - opposition was in formation", unit.Source.ObjectID, unit.Source.Name);
                 return true;
@@ -632,7 +638,7 @@ namespace Supremacy.Combat
             //    retreatChanceModifier = 0;
             //    GameLog.Core.Combat.DebugFormat("Weapon ratio was {0}. 0 modifier", weaponRatio);
             //}
-             if (oppositionIsEngage)
+            if (oppositionIsEngage)
             {
                 retreatChanceModifier += 15;
                 GameLog.Core.Combat.DebugFormat("Opposition is Engage. +15 modifier (now {0})", retreatChanceModifier);
@@ -678,7 +684,7 @@ namespace Supremacy.Combat
                     var newfleet = ship.CreateFleet();
                     newfleet.Location = destination.Location;
                     newfleet.Owner = borg;
-                  
+
                     newfleet.SetOrder(FleetOrders.EngageOrder.Create());
                     if (newfleet.Order == null)
                     {
@@ -722,7 +728,7 @@ namespace Supremacy.Combat
             catch (Exception e)
             {
                 GameLog.Core.Combat.DebugFormat("##### Problem at PerformRetreat" + Environment.NewLine + "{0}", e);
-                    //((Ship)shipStats.Source).Fleet.ObjectID, ((Ship)shipStats.Source).Fleet.Name, destination.Location.ToString(), e);
+                //((Ship)shipStats.Source).Fleet.ObjectID, ((Ship)shipStats.Source).Fleet.Name, destination.Location.ToString(), e);
             }
         }
 
@@ -745,12 +751,13 @@ namespace Supremacy.Combat
         {
             try
             {
-                GameLog.Core.Test.DebugFormat("Get Order for {0} owner {1} order {2}", source, source.Owner, _orders[source.OwnerID].GetOrder(source));
+                //GameLog.Core.Test.DebugFormat("Get Order for {0} owner {1}: -> order = {2}", source, source.Owner, _orders[source.OwnerID].GetOrder(source));
                 return _orders[source.OwnerID].GetOrder(source);
             }
             catch //(Exception e)
             {
-                GameLog.Core.Combat.ErrorFormat("Unable to get order for {0} {1} ({2}) Owner: {3}", source.ObjectID, source.Name, source.Design.Name, source.Owner.Name);
+                if (source.Owner.IsHuman == false)
+                    GameLog.Core.Combat.ErrorFormat("Unable to get order for {0} {1} ({2}) Owner: {3}", source.ObjectID, source.Name, source.Design.Name, source.Owner.Name);
                 //GameLog.LogException(e);
             }
 
@@ -761,21 +768,28 @@ namespace Supremacy.Combat
         Civilization borg = new Civilization("BORG");
         protected Civilization GetTargetOne(Orbital source)
         {
+            if (_targetOneByCiv == null || _targetOneByCiv.Count() == 0)
+            {
+                GameLog.Core.Combat.DebugFormat("_targetOneByCiv is null ... returning borg");
+                return borg;
+            }
+
             try
             {
-                GameLog.Core.Test.DebugFormat("GetTargetOne for source = {0}, Owner {1}, Targetting {2}",
-                    source, source.Owner, _targetOneByCiv[source.OwnerID].GetTargetOne(source));
-                return _targetOneByCiv[source.OwnerID].GetTargetOne(source); 
+                //GameLog.Core.Test.DebugFormat("GetTargetOne for source = {0} {1} {2} is Targetting -> {3}",
+                //    source.Owner, source.ObjectID, source.Name, _targetOneByCiv[source.OwnerID].GetTargetOne(source));
+                return _targetOneByCiv[source.OwnerID].GetTargetOne(source);
             }
             catch (Exception e)
             {
-                GameLog.Core.Test.ErrorFormat("Unable to get target one for source {0} owner ({1}, exception = {2})", source, source.Owner, e);
+                 
+                GameLog.Core.Test.ErrorFormat("Unable to get target one for source {0} owner {1}, {2}", source, source.Owner, e);
                 //GameLog.LogException(e);
             }
 
-           
 
-            //GameLog.Core.Combat.DebugFormat("Setting Borg as fallback target one for {0} {1} ({2}) Owner: {3}", source.ObjectID, source.Name, source.Design.Name, source.Owner.Name);
+
+            GameLog.Core.Combat.DebugFormat("Setting Borg as fallback target one for {0} {1} ({2}) Owner: {3}", source.ObjectID, source.Name, source.Design.Name, source.Owner.Name);
             //return _targetOneByCiv[source.CivID].GetTargetOne(source);
             return borg;
         }

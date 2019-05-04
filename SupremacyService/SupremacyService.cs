@@ -1710,9 +1710,12 @@ namespace Supremacy.WCF
                 GameLog.Core.Combat.DebugFormat("blanketOrder = {3} for {0} (Count friendly = {1} vs {2})",
                    ownerAssets.Owner, enemyAssets.CombatShips.Count + countStation, ownerAssets.CombatShips.Count + 1, blanketOrder);
 
+                blanketTargetOne = enemyAssets.Owner;
+                blanketTargetTwo = enemyAssets.Owner;
+
                 SendCombatOrders(CombatHelper.GenerateBlanketOrders(ownerAssets, blanketOrder)); // Sending of the order
-                SendCombatTarget1(CombatHelper.GenerateTargetPrimary(ownerAssets, blanketTargetOne));
-                SendCombatTarget2(CombatHelper.GenerateTargetSecondary(ownerAssets, blanketTargetTwo));
+                //SendCombatTarget1(CombatHelper.GenerateTargetPrimary(ownerAssets, blanketTargetOne));
+                //SendCombatTarget2(CombatHelper.GenerateTargetSecondary(ownerAssets, blanketTargetTwo));
             }
 
 
